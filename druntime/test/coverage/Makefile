@@ -3,8 +3,8 @@ merge := merge merge_true
 TESTS := $(normal) $(merge) no_code merge_override
 include ../new_common.mak
 
-NORMAL_TESTS := $(normal:%=$(ROOT)/%.done)
-MERGE_TESTS := $(merge:%=$(ROOT)/%.done)
+normal_tests := $(normal:%=$(ROOT)/%.done)
+merge_tests := $(merge:%=$(ROOT)/%.done)
 
 extra_dflags += -cov
 
@@ -17,7 +17,7 @@ else
     SED_INPLACE:=-i''
 endif
 
-$(NORMAL_TESTS): $(ROOT)/%.done: $(ROOT)/%$(DOTEXE)
+$(normal_tests): $(ROOT)/%.done: $(ROOT)/%$(DOTEXE)
 	@echo Testing $*
 	@$(RM) $(ROOT)/src-$*.lst
 	$< $(ROOT)
@@ -27,7 +27,7 @@ endif
 	$(DIFF) src-$*.lst.exp $(ROOT)/src-$*.lst
 	@touch $@
 
-$(MERGE_TESTS): $(ROOT)/%.done: $(ROOT)/%$(DOTEXE)
+$(merge_tests): $(ROOT)/%.done: $(ROOT)/%$(DOTEXE)
 	@echo Testing $*
 	@$(RM) $(ROOT)/src-$*.lst
 	$< $(ROOT)
