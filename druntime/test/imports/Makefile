@@ -1,14 +1,7 @@
-include ../common.mak
+TESTS := bug18193
 
-TESTS:=bug18193
+include ../new_common.mak
 
-.PHONY: all clean
-all: $(addprefix $(ROOT)/,$(addsuffix .done,$(TESTS)))
-
-$(ROOT)/%.done:
+$(ROOT)/%.done: %.d
 	@echo Testing $*
-	@mkdir -p $(basename $@)
-	$(QUIET)$(DMD) -version=Shared -o- -deps=$@ -Isrc -I../../import src/$*.d
-
-clean:
-	rm -rf $(ROOT)
+	$(COMPILE.d) -deps=$@ -version=Shared -o- $<

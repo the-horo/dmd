@@ -42,6 +42,13 @@ GENERATED:=./generated
 ROOT:=$(GENERATED)/$(OS)/$(BUILD)/$(MODEL)
 OBJDIR = $(ROOT)
 
+# non-empty if linking shared druntime. Useful for usage in $(if)
+is_linking_shared := $(filter 1,$(LINK_SHARED))
+druntime_for_linking := $(if $(is_linking_shared),$(DRUNTIMESO:.dll=.lib),$(DRUNTIME))
+DRUNTIME_DEP := $(if $(is_linking_shared),$(DRUNTIMESO),$(DRUNTIME))
+# GNU make says that compiler variables like $(DMD) can contain arguments, technically.
+DMD_DEP := $(firstword $(DMD))
+
 ifneq ($(strip $(QUIET)),)
 .SILENT:
 endif
@@ -94,21 +101,21 @@ LDFLAGS.d := $(LDFLAGS.d:%=-L%)
 
 ########## Default pattern rules ##########
 
-$(OBJDIR)/%$(DOTOBJ): %.c
+$(OBJDIR)/%$(DOTOBJ): %.c | $(OBJDIR)
 	$(COMPILE.c) $(OUTPUT_OPTION) $<
-$(OBJDIR)/%$(DOTOBJ): %.cpp
+$(OBJDIR)/%$(DOTOBJ): %.cpp | $(OBJDIR)
 	$(COMPILE.d) $(OUTPUT_OPTION) $<
-$(OBJDIR)/%$(DOTOBJ): %.d
+$(OBJDIR)/%$(DOTOBJ): %.d $(DMD_DEP) $(DRUNTIME_DEP)
 	$(COMPILE.d) $(OUTPUT_OPTION.d) $<
 
-$(OBJDIR)/%$(DOTEXE): %.c
-	$(LINK.c) $^ $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
-$(OBJDIR)/%$(DOTEXE): %.cpp
-	$(LINK.cpp) $^ $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
-$(OBJDIR)/%$(DOTEXE): %.d
-	$(LINK.d) $^ $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
-$(OBJDIR)/%$(DOTEXE): %.o
-	$(LINK.o) $^ $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+$(OBJDIR)/%$(DOTEXE): %.c | $(OBJDIR)
+	$(LINK.c) $< $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+$(OBJDIR)/%$(DOTEXE): %.cpp | $(OBJDIR)
+	$(LINK.cpp) $< $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+$(OBJDIR)/%$(DOTEXE): %.d $(DMD_DEP) $(DRUNTIME_DEP)
+	$(LINK.d) $< $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+$(OBJDIR)/%$(DOTEXE): %.o | $(OBJDIR)
+	$(LINK.o) $< $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 
 ########## Default build flags ##########
 
@@ -128,9 +135,11 @@ extra_cflags += $(PIC)
 extra_cxxflags += $(PIC)
 extra_dflags += $(PIC) -I../../src -I../../import -I$(SRC) -preview=dip1000
 
-# Shared linking
+# A lot of the tests perform assert checks. Preserve them even with -release
+extra_dflags += -check=assert
+
 extra_ldflags.d += $(if $(filter windows,$(OS)),-dllimport=all)
-extra_ldlibs.d += -L$(if $(LINK_SHARED),$(DRUNTIMESO:.dll=.lib),$(DRUNTIME))
+extra_ldlibs.d += -L$(druntime_for_linking)
 
 extra_ldflags.d += -defaultlib=
 extra_ldlibs.d += $(if $(filter-out windows,$(OS)),-L-lpthread -L-lm $(LINKDL))
@@ -141,22 +150,21 @@ TARGET_ARCH.d = $(model_flag)
 
 ########## Other common code ##########
 
-# The bellow is supposed to work, i.e. always rebuild and rerun the tests
-# when dmd or druntime change:
-#$(OBJDIR)/%$(DOTEXE): private .EXTRA_PREREQS := $(DMD) $(DRUNTIME)
-# Explicitly specifying the target works:
-# $(OBJDIR)/test_aa$(DOTEXE): private .EXTRA_PREREQS := $(DMD) $(DRUNTIME)
-# Maybe of interest: https://lists.gnu.org/archive/html/bug-make/2023-12/msg00013.html
-
 .PHONY: all cleam
-all: $(TESTS:%=$(ROOT)/%.done)
+all: $(TESTS:%=$(OBJDIR)/%.done)
 
-$(ROOT)/%.done: $(ROOT)/%$(DOTEXE)
+$(OBJDIR)/%.done: $(OBJDIR)/%$(DOTEXE)
 	$(TIMELIMIT)./$< $(run_args)
 	@touch $@
 
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
 # Preserve the executable files after running the tests
-.NOTINTERMEDIATE: $(ROOT)/%$(DOTEXE)
+.NOTINTERMEDIATE: $(OBJDIR)/%$(DOTEXE)
 
 clean:
-	$(RM) -r $(ROOT)
+	$(RM) -r $(OBJDIR)
+
+$(DMD_DEP): ; @echo "ERROR: no dmd present! Expected $(DMD_DEP)"; false
+$(DRUNTIME_DEP): ; @echo "ERROR: no druntime present! Expected $(DRUNTIME_DEP)"; false

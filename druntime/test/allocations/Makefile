@@ -1,4 +1,5 @@
-TESTS:=overflow_from_zero overflow_from_existing alloc_from_assert
+TESTS := overflow_from_zero overflow_from_existing alloc_from_assert
+
 include ../new_common.mak
 
 $(OBJDIR)/alloc_from_assert.done: $(OBJDIR)/alloc_from_assert$(DOTEXE)

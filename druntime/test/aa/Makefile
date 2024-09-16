@@ -1,2 +1,3 @@
-TESTS:=test_aa
+TESTS := test_aa
+
 include ../new_common.mak
