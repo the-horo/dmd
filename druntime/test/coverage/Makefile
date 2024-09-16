@@ -71,3 +71,4 @@ endif
 	$(DIFF) src-$*_imp.lst.exp $(ROOT)/src-$*_imp.lst
 	@touch $@
 $(ROOT)/no_code$(DOTEXE): no_code_imp.d
+$(ROOT)/no_code$(DOTEXE): extra_sources += $(SRC)/no_code_imp.d

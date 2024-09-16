@@ -14,4 +14,5 @@ $(ROOT)/%.done: $(ROOT)/test_cycles$(DOTEXE)
 	$(TIMELIMIT)$< --DRT-oncycle=$(@F:cycle_%.done=%) > $@ 2>&1; test $$? -eq $(retcode)
 	test `cat $@ | wc -l` -eq $(lines)
 
-$(ROOT)/test_cycles$(DOTEXE): $(SRC)/*.d
+$(ROOT)/test_cycles$(DOTEXE): $(SRC)/mod*.d
+$(ROOT)/test_cycles$(DOTEXE): private extra_sources = $(wildcard $(SRC)/mod*.d)

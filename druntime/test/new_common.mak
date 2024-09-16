@@ -102,20 +102,20 @@ LDFLAGS.d := $(LDFLAGS.d:%=-L%)
 ########## Default pattern rules ##########
 
 $(OBJDIR)/%$(DOTOBJ): %.c | $(OBJDIR)
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(COMPILE.c) $(OUTPUT_OPTION) $< $(extra_sources)
 $(OBJDIR)/%$(DOTOBJ): %.cpp | $(OBJDIR)
-	$(COMPILE.d) $(OUTPUT_OPTION) $<
+	$(COMPILE.d) $(OUTPUT_OPTION) $< $(extra_sources)
 $(OBJDIR)/%$(DOTOBJ): %.d $(DMD_DEP) $(DRUNTIME_DEP)
-	$(COMPILE.d) $(OUTPUT_OPTION.d) $<
+	$(COMPILE.d) $(OUTPUT_OPTION.d) $< $(extra_sources)
 
 $(OBJDIR)/%$(DOTEXE): %.c | $(OBJDIR)
-	$(LINK.c) $< $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.c) $< $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 $(OBJDIR)/%$(DOTEXE): %.cpp | $(OBJDIR)
-	$(LINK.cpp) $< $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $< $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 $(OBJDIR)/%$(DOTEXE): %.d $(DMD_DEP) $(DRUNTIME_DEP)
-	$(LINK.d) $< $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
 $(OBJDIR)/%$(DOTEXE): %.o | $(OBJDIR)
-	$(LINK.o) $< $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.o) $< $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 
 ########## Default build flags ##########
 
@@ -166,5 +166,5 @@ $(OBJDIR):
 clean:
 	$(RM) -r $(OBJDIR)
 
-$(DMD_DEP): ; @echo "ERROR: no dmd present! Expected $(DMD_DEP)"; false
-$(DRUNTIME_DEP): ; @echo "ERROR: no druntime present! Expected $(DRUNTIME_DEP)"; false
+$(DMD_DEP): ;
+$(DRUNTIME_DEP): ;
