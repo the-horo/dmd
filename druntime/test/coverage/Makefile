@@ -43,9 +43,15 @@ $(ROOT)/merge_override.done: $(ROOT)/%.done: $(ROOT)/%$(DOTEXE) $(ROOT)/1/src/%.
 	@$(RM) $(ROOT)/src-$*.lst
 
 	$< $(ROOT) $(ROOT)/1
+ifeq (windows,$(OS))
+	$(SED) $(SED_INPLACE) 's:^src\\:src/:g' $(ROOT)/src-$*.lst
+endif
 	$(DIFF) src-$*.lst_1.exp $(ROOT)/src-$*.lst
 
 	$< $(ROOT) $(ROOT)/2
+ifeq (windows,$(OS))
+	$(SED) $(SED_INPLACE) 's:^src\\:src/:g' $(ROOT)/src-$*.lst
+endif
 	$(DIFF) src-$*.lst_2.exp $(ROOT)/src-$*.lst
 
 	@touch $@
@@ -70,5 +76,5 @@ endif
 	$(DIFF) src-$*.lst.exp $(ROOT)/src-$*.lst
 	$(DIFF) src-$*_imp.lst.exp $(ROOT)/src-$*_imp.lst
 	@touch $@
-$(ROOT)/no_code$(DOTEXE): no_code_imp.d
+$(ROOT)/no_code$(DOTEXE): $(SRC)/no_code_imp.d
 $(ROOT)/no_code$(DOTEXE): extra_sources += $(SRC)/no_code_imp.d
