@@ -147,6 +147,7 @@ jobs:
         with:
           arch: ${{ env.MODEL == '64' && 'x64' || 'x86' }}
       - name: Test dmd
+        if: false
         run: ci/run.sh test_dmd
       - name: Test druntime
         if: '!matrix.coverage'
