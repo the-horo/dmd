@@ -4,15 +4,22 @@ include ../new_common.mak
 $(ROOT)/cycle_ignore.done: retcode=0
 $(ROOT)/cycle_ignore.done: lines=0
 $(ROOT)/cycle_abort.done: retcode=1
-$(ROOT)/cycle_abort.done: lines=$(if $(findstring $(OS),windows),8,7)
+# LINK_SHARED causes the abort message to contain trace lines.
+abort_lines_posix := $(if $(LINK_SHARED),,7)
+abort_lines := $(if $(filter windows,$(OS)),8,$(abort_lines_posix))
+$(ROOT)/cycle_abort.done: lines=$(abort_lines)
 $(ROOT)/cycle_print.done: retcode=0
 $(ROOT)/cycle_print.done: lines=6
+# ditto for deprecate
+deprecate_lines_posix := $(if $(LINK_SHARED),,8)
+deprecate_lines := $(if $(filter windows,$(OS)),9,$(deprecate_lines_posix))
 $(ROOT)/cycle_deprecate.done: retcode=1
-$(ROOT)/cycle_deprecate.done: lines=$(if $(findstring $(OS),windows),9,8)
+$(ROOT)/cycle_deprecate.done: lines=$(deprecate_lines)
+
 $(ROOT)/%.done: $(ROOT)/test_cycles$(DOTEXE)
 	@echo Testing $*
 	$(TIMELIMIT)$< --DRT-oncycle=$(@F:cycle_%.done=%) > $@ 2>&1; test $$? -eq $(retcode)
-	test `cat $@ | wc -l` -eq $(lines)
+	[ -z "$(lines)" ] || test `cat $@ | wc -l` -eq $(lines)
 
 $(ROOT)/test_cycles$(DOTEXE): $(SRC)/mod*.d
 $(ROOT)/test_cycles$(DOTEXE): private extra_sources = $(wildcard $(SRC)/mod*.d)
