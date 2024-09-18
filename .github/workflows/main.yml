@@ -151,6 +151,8 @@ jobs:
       - name: Test druntime
         if: '!matrix.coverage'
         run: ci/run.sh test_druntime
+        env:
+          N: 1
       - name: 'Windows x86: Add 32-bit libcurl.dll to PATH (required for Phobos unittests)'
         if: runner.os == 'Windows' && env.MODEL == '32' && !matrix.coverage
         run: |
