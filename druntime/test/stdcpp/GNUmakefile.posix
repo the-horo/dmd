@@ -54,19 +54,19 @@ $(OBJDIR)/%_oldabi_d$(DOTOBJ): private extra_dflags += -version=_GLIBCXX_USE_CXX
 $(OBJDIR)/%_d$(DOTOBJ): private extra_dflags += -main -unittest -version=CoreUnittest
 
 $(OBJDIR)/%_98$(DOTEXE): %.cpp $(OBJDIR)/%_98_d$(DOTOBJ) $(DRUNTIME_DEP)
-	$(LINK.cpp) $< $(OBJDIR)/%_98_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $< $(OBJDIR)/$*_98_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 $(OBJDIR)/%_98$(DOTEXE): private extra_cxxflags += -std=c++98
 
 $(OBJDIR)/%_11$(DOTEXE): %.cpp $(OBJDIR)/%_11_d$(DOTOBJ) $(DRUNTIME_DEP)
-	$(LINK.cpp) $< $(OBJDIR)/%_11_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $< $(OBJDIR)/$*_11_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 $(OBJDIR)/%_11$(DOTEXE): private extra_cxxflags += -std=c++11
 
 $(OBJDIR)/%_17$(DOTEXE): %.cpp $(OBJDIR)/%_17_d$(DOTOBJ) $(DRUNTIME_DEP)
-	$(LINK.cpp) $< $(OBJDIR)/%_17_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $< $(OBJDIR)/$*_17_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 $(OBJDIR)/%_17$(DOTEXE): private extra_cxxflags += -std=c++17
 
 $(OBJDIR)/%_oldabi$(DOTEXE): %.cpp $(OBJDIR)/%_oldabi_d$(DOTOBJ) $(DRUNTIME_DEP)
-	$(LINK.cpp) $< $(OBJDIR)/%_oldabi_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $< $(OBJDIR)/$*_oldabi_d$(DOTOBJ) $(extra_sources) $(extra_ldlibs) $(LDLIBS) $(OUTPUT_OPTION)
 $(OBJDIR)/%_oldabi$(DOTEXE): private extra_cppflags += -D_GLIBCXX_USE_CXX11_ABI=0 
 
 $(OBJDIR)/%$(DOTEXE): private extra_ldlibs += $(druntime_for_linking) $(d_platform_libs_cc_form)
