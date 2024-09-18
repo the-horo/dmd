@@ -113,6 +113,6 @@ $(ROOT)/plugin1$(DOTDLL) $(ROOT)/plugin2$(DOTDLL): $(ROOT)/plugin$(DOTDLL)
 
 ########## default rule for building a shared library ##########
 
-$(ROOT)/%$(DOTDLL) $(ROOT)/%$(for_linking)&: %.d $(DMD_DEP) $(DRUNTIME_DEP)
+$(ROOT)/%$(DOTDLL) $(ROOT)/%$(for_linking): %.d $(DMD_DEP) $(DRUNTIME_DEP)
 	$(LINK.d) -shared $< $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
 

@@ -48,28 +48,31 @@ druntime_for_linking := $(if $(is_linking_shared),$(DRUNTIMESO:.dll=.lib),$(DRUN
 DRUNTIME_DEP := $(if $(is_linking_shared),$(DRUNTIMESO),$(DRUNTIME))
 # GNU make says that compiler variables like $(DMD) can contain arguments, technically.
 DMD_DEP := $(firstword $(DMD))
+d_platform_libs := $(if $(filter-out windows,$(OS)),-L-lpthread -L-lm $(LINKDL))
 
 ifneq ($(strip $(QUIET)),)
 .SILENT:
 endif
 
+.SUFFIXES:
+
 ########## Default build commands ##########
 
 # Similar to the implicit rules defined by GNU make
-COMPILE.c = $(CC) $(extra_cflags) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-COMPILE.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH.d) -c
+COMPILE.c = $(CC) $(extra_cflags) $(CFLAGS) $(extra_cppflags) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(extra_cppflags) $(CPPFLAGS) $(TARGET_ARCH.d) -c
 COMPILE.d = $(DMD) $(extra_dflags) $(DFLAGS) $(TARGET_ARCH) -c
 
-LINK.c = $(CC) $(extra_cflags) $(CFLAGS) $(CPPFLAGS) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
-LINK.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(CPPFLAGS) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
+LINK.c = $(CC) $(extra_cflags) $(CFLAGS) $(extra_cppflags) $(CPPFLAGS) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
+LINK.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(extra_cppflags) $(CPPFLAGS) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
 LINK.d = $(DMD) $(extra_dflags) $(DFLAGS) $(extra_ldflags.d) $(LDFLAGS.d) $(TARGET_ARCH.d)
 LINK.o = $(CC) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
 
-OUTPUT_FLAG = -o #<- important space: OUTPUT_FLAG = "-o "
-OUTPUT_FLAG.d = -of=
-
 OUTPUT_OPTION = $(OUTPUT_FLAG)$@
 OUTPUT_OPTION.d = $(OUTPUT_FLAG.d)$@
+
+OUTPUT_FLAG = -o #<- important space: OUTPUT_FLAG = "-o "
+OUTPUT_FLAG.d = -of=
 
 ifeq (windows,$(OS))
     DOTEXE:=.exe
@@ -121,11 +124,11 @@ $(OBJDIR)/%$(DOTEXE): %.o | $(OBJDIR)
 
 ifeq ($(BUILD),debug)
     CFLAGS = $(if $(filter windows,$(OS)),/Zi,-g)
-    CXXFLAGS :::= $(CFLAGS)
+    CXXFLAGS = $(if $(filter windows,$(OS)),/Zi,-g)
     DFLAGS = -g -debug
 else
     CFLAGS = $(if $(filter windows,$(OS)),/O2,-O3)
-    CXXFLAGS :::= $(CFLAGS)
+    CXXFLAGS = $(if $(filter windows,$(OS)),/O2,-O3)
     DFLAGS = -O -release
 endif
 CFLAGS += $(if $(filter windows,$(OS)),/Wall,-Wall)
@@ -142,7 +145,7 @@ extra_ldflags.d += $(if $(filter windows,$(OS)),-dllimport=all)
 extra_ldlibs.d += -L$(druntime_for_linking)
 
 extra_ldflags.d += -defaultlib=
-extra_ldlibs.d += $(if $(filter-out windows,$(OS)),-L-lpthread -L-lm $(LINKDL))
+extra_ldlibs.d += $(d_platform_libs)
 
 model_flag := $(if $(filter-out default,$(MODEL)),-m$(MODEL))
 TARGET_ARCH = $(model_flag) $(if $(filter osx64,$(OS)$(MODEL)),--target=x86_64-darwin-apple)
@@ -154,6 +157,7 @@ TARGET_ARCH.d = $(model_flag)
 all: $(TESTS:%=$(OBJDIR)/%.done)
 
 $(OBJDIR)/%.done: $(OBJDIR)/%$(DOTEXE)
+	@echo Testing $*
 	$(TIMELIMIT)./$< $(run_args)
 	@touch $@
 

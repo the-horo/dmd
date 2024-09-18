@@ -1,0 +1,70 @@
+
+TESTS:=allocator array memory new string utility vector
+
+msc_ver:=$(strip $(shell $(CC) /nologo /EP msc_ver.c))
+ifeq (1,$(intcmp $(msc_ver),1900,0,1,1))
+    extra_cxxflags += /std:c++17
+    extra_dflags += -extern-std=c++17
+    TESTS+=string_view
+endif
+
+TESTS := $(TESTS:=_mt) $(TESTS:=_md) $(TESTS:=_mtd) $(TESTS:=_mdd)
+
+include ../new_common.mak
+
+CXX := cl
+extra_cxxflags += /nologo /EHsc
+extra_dflags += -version=_MSC_VER_$(msc_ver)
+OUTPUT_FLAG = /Fo
+
+$(OBJDIR)/%_mt_cpp$(DOTOBJ): %.cpp
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
+$(OBJDIR)/%_mt_cpp$(DOTOBJ): private extra_cxxflags += /MT
+$(OBJDIR)/%_md_cpp$(DOTOBJ): %.cpp
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
+$(OBJDIR)/%_md_cpp$(DOTOBJ): private extra_cxxflags += /MD
+$(OBJDIR)/%_mtd_cpp$(DOTOBJ): %.cpp
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
+$(OBJDIR)/%_mtd_cpp$(DOTOBJ): private extra_cxxflags += /MTd
+$(OBJDIR)/%_mdd_cpp$(DOTOBJ): %.cpp
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
+$(OBJDIR)/%_mdd_cpp$(DOTOBJ): private extra_cxxflags += /MDd
+
+$(OBJDIR)/%_mt$(DOTEXE): %_test.d $(OBJDIR)/%_mt_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
+	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+$(OBJDIR)/%_mt$(DOTEXE): private extra_ldflags.d += -mscrtlib=libcmt
+$(OBJDIR)/%_md$(DOTEXE): %_test.d $(OBJDIR)/%_md_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
+	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+$(OBJDIR)/%_md$(DOTEXE): private extra_ldflags.d += -mscrtlib=msvcrt
+$(OBJDIR)/%_mtd$(DOTEXE): %_test.d $(OBJDIR)/%_mtd_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
+	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+$(OBJDIR)/%_mtd$(DOTEXE): private extra_ldflags.d += -mscrtlib=libcmtd
+$(OBJDIR)/%_mdd$(DOTEXE): %_test.d $(OBJDIR)/%_mdd_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
+	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+$(OBJDIR)/%_mdd$(DOTEXE): private extra_ldflags.d += -mscrtlib=msvcrtd
+
+short_test_names = mt md mtd mdd
+.NOTINTERMEDIATE: \
+    $(short_test_names:%=$(OBJDIR)/\%_%_cpp$(DOTOBJ)) \
+    $(short_test_names:%=$(OBJDIR)/\%_%$(DOTEXE))
+# .NOTINTERMEDIATE: $(OBJDIR)/%_mt_d$(DOTOBJ) $(OBJDIR)/%_$(DOTEXE) ...
+
+# $(ROOT)/%: %.cpp %_test.d
+# 	@echo Testing $*
+# 	@mkdir -p $($@D)
+
+# 	$(QUIET)$(CXX) /MT $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
+# 	$(QUIET)$(DMD) -mscrtlib=libcmt $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
+# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
+
+# 	$(QUIET)$(CC) /MD $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
+# 	$(QUIET)$(DMD) -mscrtlib=msvcrt $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
+# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
+
+# 	$(QUIET)$(CC) /MTd $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
+# 	$(QUIET)$(DMD) -mscrtlib=libcmtd $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
+# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
+
+# 	$(QUIET)$(CC) /MDd $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
+# 	$(QUIET)$(DMD) -mscrtlib=msvcrtd $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
+# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
