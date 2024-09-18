@@ -33,16 +33,16 @@ $(OBJDIR)/%_mdd_cpp$(DOTOBJ): %.cpp | $(OBJDIR)
 $(OBJDIR)/%_mdd_cpp$(DOTOBJ): private extra_cxxflags += /MDd
 
 $(OBJDIR)/%_mt$(DOTEXE): %_test.d $(OBJDIR)/%_mt_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
-	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+	$(LINK.d) $< $(OBJDIR)/$*_mt_cpp$(DOTOBJ) $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
 $(OBJDIR)/%_mt$(DOTEXE): private extra_ldflags.d += -mscrtlib=libcmt
 $(OBJDIR)/%_md$(DOTEXE): %_test.d $(OBJDIR)/%_md_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
-	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+	$(LINK.d) $< $(OBJDIR)/$*_md_cpp$(DOTOBJ) $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
 $(OBJDIR)/%_md$(DOTEXE): private extra_ldflags.d += -mscrtlib=msvcrt
 $(OBJDIR)/%_mtd$(DOTEXE): %_test.d $(OBJDIR)/%_mtd_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
-	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+	$(LINK.d) $< $(OBJDIR)/$*_mtd_cpp$(DOTOBJ) $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
 $(OBJDIR)/%_mtd$(DOTEXE): private extra_ldflags.d += -mscrtlib=libcmtd
 $(OBJDIR)/%_mdd$(DOTEXE): %_test.d $(OBJDIR)/%_mdd_cpp$(DOTOBJ) $(DMD_DEP) $(DRUNTIME_DEP)
-	$(LINK.d) $< $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
+	$(LINK.d) $< $(OBJDIR)/$*_mdd_cpp$(DOTOBJ) $(extra_sources) $(extra_ldlibs.d) $(LDLIBS.d) $(OUTPUT_OPTION.d)
 $(OBJDIR)/%_mdd$(DOTEXE): private extra_ldflags.d += -mscrtlib=msvcrtd
 
 short_test_names = mt md mtd mdd
