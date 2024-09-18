@@ -17,7 +17,7 @@ CXX := cl
 OUTPUT_FLAG := /Fo
 TARGET_ARCH :=
 extra_cxxflags += /nologo /EHsc
-extra_dflags += -version=_MSC_VER_$(msc_ver)
+extra_dflags += -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER)
 
 $(OBJDIR)/%_mt_cpp$(DOTOBJ): %.cpp | $(OBJDIR)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
