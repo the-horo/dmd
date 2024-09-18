@@ -6,11 +6,22 @@ ifneq ($(OS),windows)
     # some .d files are for Posix only
     TESTS+=sentinel1 sentinel2 forkgc forkgc2 sigmaskgc startbackgc
     # and some tests require the `fork` GC, only supported on Posix
-    TEST+=concurrent precise_concurrent hospital
+    TESTS+=concurrent precise_concurrent hospital
 endif
 
 ifeq ($(OS),linux)
     TESTS+=issue22843
+endif
+
+VALGRIND = valgrind
+has_valgrind != command -v $(VALGRIND) > /dev/null 2>&1 && echo 1
+
+ifeq ($(has_valgrind),1)
+valgrind_new_enough != $(VALGRIND) --version | grep -E 'valgrind-3.([0-9]|1[012])\b' || echo 1
+endif
+
+ifeq ($(valgrind_new_enough),1)
+TESTS += issue22843
 endif
 
 include ../new_common.mak
@@ -25,14 +36,8 @@ core_ut = -unittest -version=CoreUnittest
 # needs to run under valgrind
 # versions before 3.13.0 don't handle clone() correctly, skip them
 $(ROOT)/issue22843.done: $(ROOT)/issue22843$(DOTEXE)
-	@echo Testing issue22843
-	if ! command -v valgrind >/dev/null; then \
-		echo valgrind not installed, skipping; \
-	elif valgrind --version | grep -Eq 'valgrind-3.([0-9]|1[012])\b'; then \
-		echo valgrind version too old, skipping; \
-	else \
-		$(TIMELIMIT)valgrind --quiet --tool=none $(ROOT)/issue22843 $(run_args); \
-	fi
+	@echo Testing $(<F:$(DOTEXE)=)
+	$(TIMELIMIT)$(VALGRIND) --quiet --tool=none $(ROOT)/issue22843 $(run_args)
 	@touch $@
 
 $(ROOT)/sentinel$(DOTEXE): $(src_lifetime)

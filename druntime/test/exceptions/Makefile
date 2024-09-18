@@ -13,8 +13,8 @@ endif
 
 ifeq ($(OS),linux)
 # Only add this test if gdb is available.
-    ifneq (,$(shell which $(GDB)))
-    TESTS+=rt_trap_exceptions_drt_gdb
+    ifneq (,$(shell which $(GDB) > /dev/null 2>&1 && echo 1))
+	TESTS+=rt_trap_exceptions_drt_gdb
     endif
 endif
 
@@ -117,6 +117,7 @@ $(ROOT)/rt_trap_exceptions_drt_gdb.done: $(ROOT)/rt_trap_exceptions_drt$(DOTEXE)
 	@touch $@
 
 $(ROOT)/refcounted.done: $(ROOT)/refcounted$(DOTEXE)
+	@echo Testing $(<F:$(DOTEXE)=)
 	$<
 	@touch $@
 
@@ -135,8 +136,3 @@ $(ROOT)/rt_trap_exceptions_drt$(DOTEXE): extra_dflags += -g
 $(ROOT)/refcounted$(DOTEXE): extra_dflags+=-dip1008
 $(ROOT)/cpp_demangle$(DOTEXE): extra_ldflags.d+=$(line_trace_dflags)
 $(ROOT)/cpp_demangle$(DOTEXE): extra_ldlibs.d+=-L-lstdc++
-
-$(ROOT)/assert_fail$(DOTEXE): extra_dflags += -check=assert
-$(ROOT)/refcounted$(DOTEXE): extra_dflags += -check=assert
-$(ROOT)/catch_in_finally$(DOTEXE): extra_dflags += -check=assert
-$(ROOT)/winstack$(DOTEXE): extra_dflags += -check=assert
