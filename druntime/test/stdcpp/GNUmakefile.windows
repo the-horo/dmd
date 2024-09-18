@@ -1,5 +1,14 @@
-
 TESTS:=allocator array memory new string utility vector
+
+CC := cl
+CXX := cl
+TARGET_ARCH :=
+OUTPUT_FLAG = /Fo
+extra_cxxflags += /nologo /EHsc
+extra_dflags += -version=_MSC_VER_$(msc_ver)
+
+$(info 'FINDME -- $(CC) /nologo /EP msc_ver.c --')
+$(info 'FINDME -- $(shell $(CC) /nologo /EP msc_ver.c --)')
 
 msc_ver:=$(strip $(shell $(CC) /nologo /EP msc_ver.c))
 ifeq (1,$(intcmp $(msc_ver),1900,0,1,1))
@@ -11,11 +20,6 @@ endif
 TESTS := $(TESTS:=_mt) $(TESTS:=_md) $(TESTS:=_mtd) $(TESTS:=_mdd)
 
 include ../new_common.mak
-
-CXX := cl
-extra_cxxflags += /nologo /EHsc
-extra_dflags += -version=_MSC_VER_$(msc_ver)
-OUTPUT_FLAG = /Fo
 
 $(OBJDIR)/%_mt_cpp$(DOTOBJ): %.cpp
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
