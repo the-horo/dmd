@@ -19,16 +19,16 @@ TARGET_ARCH :=
 extra_cxxflags += /nologo /EHsc
 extra_dflags += -version=_MSC_VER_$(msc_ver)
 
-$(OBJDIR)/%_mt_cpp$(DOTOBJ): %.cpp
+$(OBJDIR)/%_mt_cpp$(DOTOBJ): %.cpp | $(OBJDIR)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
 $(OBJDIR)/%_mt_cpp$(DOTOBJ): private extra_cxxflags += /MT
-$(OBJDIR)/%_md_cpp$(DOTOBJ): %.cpp
+$(OBJDIR)/%_md_cpp$(DOTOBJ): %.cpp | $(OBJDIR)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
 $(OBJDIR)/%_md_cpp$(DOTOBJ): private extra_cxxflags += /MD
-$(OBJDIR)/%_mtd_cpp$(DOTOBJ): %.cpp
+$(OBJDIR)/%_mtd_cpp$(DOTOBJ): %.cpp | $(OBJDIR)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
 $(OBJDIR)/%_mtd_cpp$(DOTOBJ): private extra_cxxflags += /MTd
-$(OBJDIR)/%_mdd_cpp$(DOTOBJ): %.cpp
+$(OBJDIR)/%_mdd_cpp$(DOTOBJ): %.cpp | $(OBJDIR)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $< $(extra_sources)
 $(OBJDIR)/%_mdd_cpp$(DOTOBJ): private extra_cxxflags += /MDd
 
@@ -50,23 +50,3 @@ short_test_names = mt md mtd mdd
     $(short_test_names:%=$(OBJDIR)/\%_%_cpp$(DOTOBJ)) \
     $(short_test_names:%=$(OBJDIR)/\%_%$(DOTEXE))
 # .NOTINTERMEDIATE: $(OBJDIR)/%_mt_d$(DOTOBJ) $(OBJDIR)/%_$(DOTEXE) ...
-
-# $(ROOT)/%: %.cpp %_test.d
-# 	@echo Testing $*
-# 	@mkdir -p $($@D)
-
-# 	$(QUIET)$(CXX) /MT $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
-# 	$(QUIET)$(DMD) -mscrtlib=libcmt $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
-# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
-
-# 	$(QUIET)$(CC) /MD $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
-# 	$(QUIET)$(DMD) -mscrtlib=msvcrt $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
-# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
-
-# 	$(QUIET)$(CC) /MTd $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
-# 	$(QUIET)$(DMD) -mscrtlib=libcmtd $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
-# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
-
-# 	$(QUIET)$(CC) /MDd $(EXTRA_CXXFLAGS) -c /Fo$@_cpp$(DOTOBJ) $<
-# 	$(QUIET)$(DMD) -mscrtlib=msvcrtd $(DFLAGS) $(EXTRA_DFLAGS) -main -unittest -version=CoreUnittest -version=_MSC_VER_$(MSC_VER) -of$@$(DOTEXE) $@_cpp$(DOTOBJ) $(SRC)/$*_test.d
-# 	$(QUIET)$(TIMELIMIT)$@ $(RUN_ARGS)
