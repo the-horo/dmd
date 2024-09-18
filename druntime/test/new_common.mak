@@ -59,8 +59,8 @@ endif
 
 # Similar to the implicit rules defined by GNU make
 COMPILE.c = $(CC) $(extra_cflags) $(CFLAGS) $(extra_cppflags) $(CPPFLAGS) $(TARGET_ARCH) -c
-COMPILE.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(extra_cppflags) $(CPPFLAGS) $(TARGET_ARCH.d) -c
-COMPILE.d = $(DMD) $(extra_dflags) $(DFLAGS) $(TARGET_ARCH) -c
+COMPILE.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(extra_cppflags) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.d = $(DMD) $(extra_dflags) $(DFLAGS) $(TARGET_ARCH.d) -c
 
 LINK.c = $(CC) $(extra_cflags) $(CFLAGS) $(extra_cppflags) $(CPPFLAGS) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
 LINK.cpp = $(CXX) $(extra_cxxflags) $(CXXFLAGS) $(extra_cppflags) $(CPPFLAGS) $(extra_ldflags) $(LDFLAGS) $(TARGET_ARCH)
