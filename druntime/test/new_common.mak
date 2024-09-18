@@ -140,7 +140,11 @@ extra_dflags += $(PIC) -I../../src -I../../import -I$(SRC) -preview=dip1000
 # A lot of the tests perform assert checks. Preserve them even with -release
 extra_dflags += -check=assert
 
-extra_ldflags.d += $(if $(filter windows,$(OS)),-dllimport=all)
+ifdef LINK_SHARED
+ifeq ($(OS),windows)
+extra_ldflags.d += -dllimport=all
+endif
+endif
 extra_ldlibs.d += -L$(druntime_for_linking)
 
 extra_ldflags.d += -defaultlib=
