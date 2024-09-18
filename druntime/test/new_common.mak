@@ -43,9 +43,8 @@ ROOT:=$(GENERATED)/$(OS)/$(BUILD)/$(MODEL)
 OBJDIR = $(ROOT)
 
 # non-empty if linking shared druntime. Useful for usage in $(if)
-is_linking_shared := $(filter 1,$(LINK_SHARED))
-druntime_for_linking := $(if $(is_linking_shared),$(DRUNTIMESO:.dll=.lib),$(DRUNTIME))
-DRUNTIME_DEP := $(if $(is_linking_shared),$(DRUNTIMESO),$(DRUNTIME))
+druntime_for_linking := $(if $(LINK_SHARED),$(DRUNTIMESO:.dll=.lib),$(DRUNTIME))
+DRUNTIME_DEP := $(if $(LINK_SHARED),$(DRUNTIMESO),$(DRUNTIME))
 # GNU make says that compiler variables like $(DMD) can contain arguments, technically.
 DMD_DEP := $(firstword $(DMD))
 d_platform_libs := $(if $(filter-out windows,$(OS)),-L-lpthread -L-lm $(LINKDL))

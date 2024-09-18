@@ -46,6 +46,10 @@ $(ROOT)/dynamiccast.done: $(ROOT)/%.done: $(ROOT)/%$(DOTEXE) $(ROOT)/%$(DOTDLL)
 $(ROOT)/dynamiccast$(DOTEXE): private extra_ldlibs.d += $(LINKDL)
 $(ROOT)/dynamiccast$(DOTDLL): private extra_dflags += -version=DLL
 
+# Avoid a race condition that I sometimes hit with make -j8.
+# Maybe temporary file collisions when invoking the linker?
+$(OBJDIR)/dynamiccast$(DOTEXE): $(OBJDIR)/dynamiccast$(DOTDLL)
+
 $(OBJDIR)/link$(DOTEXE): $(OBJDIR)/lib$(for_linking)
 $(OBJDIR)/link$(DOTEXE): private extra_ldlibs.d += $(abs_root)/lib$(for_linking)
 
