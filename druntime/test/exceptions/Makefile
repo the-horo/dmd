@@ -30,7 +30,7 @@ ifeq ($(OS),osx)
     TESTS+=line_trace line_trace_21656 cpp_demangle
     line_trace_dflags:=
 endif
-ifeq ($(OS),windows)
+ifeq ($(OS)-$(BUILD),windows-debug)
     TESTS+=winstack
 endif
 include ../new_common.mak
